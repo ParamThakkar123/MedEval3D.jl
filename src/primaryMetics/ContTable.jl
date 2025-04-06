@@ -60,9 +60,6 @@ return [tn,tp,fp,fn ]
 end   #TnTpFpFn
 
 
-
-
-
 """
 calculating  a,b,c,d constants - needed for some particulary pairwise comparison metrics WITHOUT voxel volume correction
 isVariedSlice- true if slices can have varying thickness
@@ -101,7 +98,3 @@ helper function calculating binomial
 function binomial(val::Float64)::Float64
     return  val*(val-1)
 end #binomial
-
-
-
-end #ContTable

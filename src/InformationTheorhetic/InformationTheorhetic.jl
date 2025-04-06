@@ -62,8 +62,6 @@ function variationOfInformation(tn,tp,fp, fn)
     MI=H1+H2-H12;
     
     return H1+H2-2*MI;
-
-
 end#variationOfInformation
 
 end #InformationTheorhetic

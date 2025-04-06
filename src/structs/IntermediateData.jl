@@ -3,7 +3,6 @@ Storing the intermediate results  - like true positives
 ... and other constants that will be used to given metricks  
 """
 module  IntermediateData
-
 using Parameters
 
 

@@ -26,103 +26,47 @@ define dso_local i16 @"?addToTp@@YAG_N0G@Z"(i1 zeroext %0, i1 zeroext %1, i16 %2
 }
 """
 
-
-
-
-
-    # intrinsic = "llvm.nvvm.vote.$mode"
-    # @eval begin
-    #     @inline $fname(pred) =
-    #         Base.llvmcall($("""
-    #             declare i32 @$intrinsic(i1)
-    #             define i32 @entry(i8) #0 {
-    #                 %predicate = icmp eq i8 %0, 1
-    #                 %ret = call i32 @$intrinsic(i1 %predicate)
-    #                 ret i32 %ret
-    #             }
-    #             attributes #0 = { alwaysinline }""", "entry"),
-    #         UInt32, Tuple{Bool}, pred)
-    # end
-
-    # # warp-synchronous
-    # intrinsic = "llvm.nvvm.vote.$mode.sync"
-
-
-
-    fname = Symbol("addToTp")
-    @eval export $fname
-   @eval begin
-        @inline addToTp(boolGold, boolSegm,tp) =
-            Base.llvmcall($("""
-            $codee
-                attributes #0 = { alwaysinline }""", "addToTp"),
-            UInt32, Tuple{Bool, Bool, UInt32}, boolGold, boolSegm,tp)
-    end
-#    @eval begin
-#         @inline addToTp(boolGold, boolSegm,tp) =
-#             Base.llvmcall($("""
-#             define i32 @addToTp(i32 %tp) #0 {
-#                 ret i32 %tp
-#             }
-#                 attributes #0 = { alwaysinline }""", "addToTp"),
-#             UInt32, Tuple{Bool, Bool, UInt32}, boolGold, boolSegm,tp)
-#     end
-addToTp(true,true,UInt32(1))
-
-# using Test
-
-# function do_the_call()
-#     Base.llvmcall(
-#         ("""declare double @jl_test_returns_float()
-#             define double @entry() #0 {
-#             0:
-#                 %1 = call double @jl_test_returns_float()
-#                 ret double %1
-#             }
-#             attributes #0 = { alwaysinline }
-#         """, "entry"),Float64,Tuple{})
-# end
-# @test do_the_call() === 42.0
-
-# @eval export $fname, $fname_sync
-# using Test
-# function zz(x::UInt16, y::UInt16)
-#     Base.llvmcall("""%3 = add i16 %1, %0
-#                 ret i16 %3""", UInt16, Tuple{UInt16, UInt16}, x, y)
-# end
-# @test zz(UInt16(1),UInt16(2))==UInt16(3)
+fname = Symbol("addToTp")
+@eval export $fname
+@eval begin
+	@inline addToTp(boolGold, boolSegm, tp) =
+		Base.llvmcall($("""
+		$codee
+			attributes #0 = { alwaysinline }""", "addToTp"),
+			UInt32, Tuple{Bool, Bool, UInt32}, boolGold, boolSegm, tp)
+end
+addToTp(true, true, UInt32(1))
 
 using Test
-function addToFp(boolGold::Bool, boolSegm::Bool,tp::UInt16)
-    Base.llvmcall("""
-    %4 = xor i8 %0, %1
-    %5 = and i8 %4, %1
-    %6 = zext i8 %5 to i16
-    %7 = add i16 %2,%6
-    ret i16 %7""", UInt16, Tuple{Bool,Bool, UInt16}, boolGold, boolSegm,tp)
+function addToFp(boolGold::Bool, boolSegm::Bool, tp::UInt16)
+	Base.llvmcall("""
+	%4 = xor i8 %0, %1
+	%5 = and i8 %4, %1
+	%6 = zext i8 %5 to i16
+	%7 = add i16 %2,%6
+	ret i16 %7""", UInt16, Tuple{Bool, Bool, UInt16}, boolGold, boolSegm, tp)
 end
 
-@test addToFp(false,true,UInt16(2))==UInt16(3)
-@test addToFp(true,true,UInt16(2))==UInt16(2)
-@test addToFp(false,false,UInt16(2))==UInt16(2)
-@test addToFp(true,false,UInt16(2))==UInt16(2)
+@test addToFp(false, true, UInt16(2)) == UInt16(3)
+@test addToFp(true, true, UInt16(2)) == UInt16(2)
+@test addToFp(false, false, UInt16(2)) == UInt16(2)
+@test addToFp(true, false, UInt16(2)) == UInt16(2)
 
 
-function addToFn(boolGold::Bool, boolSegm::Bool,tp::UInt16)
-    Base.llvmcall("""
-    %4 = xor i8 %0, %1
-    %5 = and i8 %4, %0
-    %6 = zext i8 %5 to i16
-    %7 = add i16 %2,%6
-    ret i16 %7""", UInt16, Tuple{Bool,Bool, UInt16}, boolGold, boolSegm,tp)
+function addToFn(boolGold::Bool, boolSegm::Bool, tp::UInt16)
+	Base.llvmcall("""
+	%4 = xor i8 %0, %1
+	%5 = and i8 %4, %0
+	%6 = zext i8 %5 to i16
+	%7 = add i16 %2,%6
+	ret i16 %7""", UInt16, Tuple{Bool, Bool, UInt16}, boolGold, boolSegm, tp)
 end
 
-@test addToFn(false,true,UInt16(2))==UInt16(2)
-@test addToFn(true,true,UInt16(2))==UInt16(2)
-@test addToFn(false,false,UInt16(2))==UInt16(2)
-@test addToFn(true,false,UInt16(2))==UInt16(3)
+@test addToFn(false, true, UInt16(2)) == UInt16(2)
+@test addToFn(true, true, UInt16(2)) == UInt16(2)
+@test addToFn(false, false, UInt16(2)) == UInt16(2)
+@test addToFn(true, false, UInt16(2)) == UInt16(3)
 
-
-x=UInt16(1)
-zz(true,true,x)
+x = UInt16(1)
+zz(true, true, x)
 x

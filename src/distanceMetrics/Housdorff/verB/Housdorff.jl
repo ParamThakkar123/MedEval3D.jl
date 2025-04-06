@@ -4,42 +4,118 @@ collecting all needed  functions required to calculate Housdorff distance
 """
 module Housdorff
 using CUDA
-using ..CUDAGpuUtils ,..IterationUtils,..ReductionUtils , ..MemoryUtils,..CUDAAtomicUtils
-using ..BitWiseUtils,..MetadataAnalyzePass,..MetaDataUtils,..WorkQueueUtils,..ProcessMainDataVerB,..HFUtils,..ResultListUtils,..PrepareArrtoBool, ..MainLoopKernel,..ScanForDuplicates
-export get_shmemMainKernel, getHousedorffDistance,boolKernelLoad,mainKernelLoad,get_shmemMainKernel,get_shmemBoolKernel,preparehousedorfKernel
+using ..CUDAGpuUtils, ..IterationUtils, ..ReductionUtils, ..MemoryUtils, ..CUDAAtomicUtils
+using ..BitWiseUtils, ..MetadataAnalyzePass, ..MetaDataUtils, ..WorkQueueUtils, ..ProcessMainDataVerB, ..HFUtils, ..ResultListUtils, ..PrepareArrtoBool, ..MainLoopKernel, ..ScanForDuplicates
+export get_shmemMainKernel, getHousedorffDistance, boolKernelLoad, mainKernelLoad, get_shmemMainKernel, get_shmemBoolKernel, preparehousedorfKernel
 """
 calculate housedorff distance of given arrays with given robustness percentage
 
 """
-function getHousedorffDistance(goldGPUa,segmGPUa,boolKernelArgs,mainKernelArgs,threadsBoolKern,blocksBoolKern ,threadsMainKern,blocksMainKern,shmemSizeBool,shmemSizeMain)
-    # boolKernelArgs[1]= goldGPU
-    # boolKernelArgs[2]= segmGPU
-    mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength = boolKernelArgs
+function getHousedorffDistance(goldGPUa, segmGPUa, boolKernelArgs, mainKernelArgs, threadsBoolKern, blocksBoolKern, threadsMainKern, blocksMainKern, shmemSizeBool, shmemSizeMain)
+	# boolKernelArgs[1]= goldGPU
+	# boolKernelArgs[2]= segmGPU
+	mainArrDims,
+	dataBdim,
+	metaData,
+	metaDataDims,
+	reducedGoldA,
+	reducedSegmA,
+	loopXinPlane,
+	loopYinPlane,
+	minxRes,
+	maxxRes,
+	minyRes,
+	maxyRes,
+	minzRes,
+	maxzRes,
+	fn,
+	fp,
+	numberToLooFor,
+	inBlockLoopXZIterWithPadding,
+	shmemblockDataLoop,
+	shmemblockDataLenght,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength = boolKernelArgs
 
-    @cuda threads=threadsBoolKern blocks=blocksBoolKern shmem=shmemSizeBool  cooperative=true boolKernelLoad(goldGPUa,segmGPUa,boolKernelArgs...)
-    #now time to get data structures dependent on bool kernel like for example loading subsections of meta data, creating work queue ...
-    #some arrays needs to be instantiated only after we know the number of the false and true positives
-    metaData,reducedGoldA  ,reducedSegmA ,paddingStore,resList,workQueue,workQueueCounter= getBigGPUForHousedorffAfterBoolKernel(metaData,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp,reducedGoldA,reducedSegmA,dataBdim)
-    referenceArrs,dilatationArrs, mainArrDims,dataBdim,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount    ,globalIterationNumb,workQueue,workQueueCounter,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop= mainKernelArgs
+	@cuda threads = threadsBoolKern blocks = blocksBoolKern shmem = shmemSizeBool cooperative = true boolKernelLoad(goldGPUa, segmGPUa, boolKernelArgs...)
+	#now time to get data structures dependent on bool kernel like for example loading subsections of meta data, creating work queue ...
+	#some arrays needs to be instantiated only after we know the number of the false and true positives
+	metaData, reducedGoldA, reducedSegmA, paddingStore, resList, workQueue, workQueueCounter = getBigGPUForHousedorffAfterBoolKernel(metaData, minxRes, maxxRes, minyRes, maxyRes, minzRes, maxzRes, fn, fp, reducedGoldA, reducedSegmA, dataBdim)
+	referenceArrs,
+	dilatationArrs,
+	mainArrDims,
+	dataBdim,
+	numberToLooFor,
+	metaDataDims,
+	metaData,
+	iterThrougWarNumb,
+	robustnessPercent,
+	shmemSumLengthMaxDiv4,
+	globalFpResOffsetCounter,
+	globalFnResOffsetCounter,
+	globalIterationNumber,
+	globalCurrentFnCount,
+	globalCurrentFpCount,
+	globalIterationNumb,
+	workQueue,
+	workQueueCounter,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength,
+	fn,
+	fp,
+	resList,
+	inBlockLoopXZIterWithPadding,
+	paddingStore,
+	shmemblockDataLenght,
+	shmemblockDataLoop = mainKernelArgs
 
-    dilatationArrs= (reducedGoldA,reducedSegmA)
-    #reverse order as when dilatating gold we want to establish do we cover segm voxels
-    referenceArrs=(segmGPUa,goldGPUa )
-       
-    #main calculations
-    @cuda threads=threadsMainKern blocks=blocksMainKern shmem=shmemSizeMain cooperative=true mainKernelLoadB( referenceArrs,dilatationArrs, mainArrDims,dataBdim
-    ,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent
-    ,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter
-    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount
-    ,globalIterationNumb,workQueue,workQueueCounter
-    ,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed
-    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY
-    ,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop
-    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop)
-        #@cuda threads=threadsMainKern blocks=blocksMainKern shmem=shmemSizeMain cooperative=true mainKernelLoad(dilatationArrs,referenceArrs, mainArrDims,dataBdim,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount,globalIterationNumb,workQueaue,resList,resListIndicies,maxResListIndex,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp)
-    return globalIterationNumb
-    
-    end
+	dilatationArrs = (reducedGoldA, reducedSegmA)
+	#reverse order as when dilatating gold we want to establish do we cover segm voxels
+	referenceArrs = (segmGPUa, goldGPUa)
+
+	#main calculations
+	@cuda threads = threadsMainKern blocks = blocksMainKern shmem = shmemSizeMain cooperative = true mainKernelLoadB(referenceArrs, dilatationArrs, mainArrDims, dataBdim, numberToLooFor, metaDataDims, metaData, iterThrougWarNumb, robustnessPercent,
+		shmemSumLengthMaxDiv4, globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber, globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb, workQueue, workQueueCounter, loopAXFixed, loopBXfixed, loopAYFixed, loopBYfixed,
+		loopAZFixed, loopBZfixed, loopdataDimMainX, loopdataDimMainY, loopdataDimMainZ, inBlockLoopX, inBlockLoopY, inBlockLoopZ, metaDataLength, loopMeta, loopWarpMeta, clearIterResShmemLoop, clearIterSourceShmemLoop, resShmemTotalLength,
+		sourceShmemTotalLength, fn, fp, resList, inBlockLoopXZIterWithPadding, paddingStore, shmemblockDataLenght, shmemblockDataLoop)
+	#@cuda threads=threadsMainKern blocks=blocksMainKern shmem=shmemSizeMain cooperative=true mainKernelLoad(dilatationArrs,referenceArrs, mainArrDims,dataBdim,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount,globalIterationNumb,workQueaue,resList,resListIndicies,maxResListIndex,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp)
+	return globalIterationNumb
+
+end
 
 """
 clearing data before next execution
@@ -52,64 +128,96 @@ end
 """
 for invoking getBoolCubeKernel
 """
-function boolKernelLoad(goldGPU,segmGPU,mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength)
-    @getBoolCubeKernel()
-    return
+function boolKernelLoad(
+	goldGPU,
+	segmGPU,
+	mainArrDims,
+	dataBdim,
+	metaData,
+	metaDataDims,
+	reducedGoldA,
+	reducedSegmA,
+	loopXinPlane,
+	loopYinPlane,
+	minxRes,
+	maxxRes,
+	minyRes,
+	maxyRes,
+	minzRes,
+	maxzRes,
+	fn,
+	fp,
+	numberToLooFor,
+	inBlockLoopXZIterWithPadding,
+	shmemblockDataLoop,
+	shmemblockDataLenght,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength,
+)
+	@getBoolCubeKernel()
+	return
 end
 """
 main function responsible for calculations of Housedorff distance
 """
-function mainKernelLoadB(referenceArrs,dilatationArrs, mainArrDims,dataBdim
-    ,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent
-    ,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter
-    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount
-    ,globalIterationNumb,workQueue,workQueueCounter
-    ,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed
-    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY
-    ,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop
-    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop)
+function mainKernelLoadB(referenceArrs, dilatationArrs, mainArrDims, dataBdim, numberToLooFor, metaDataDims, metaData, iterThrougWarNumb, robustnessPercent, shmemSumLengthMaxDiv4, globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber,
+	globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb, workQueue, workQueueCounter, loopAXFixed, loopBXfixed, loopAYFixed, loopBYfixed, loopAZFixed, loopBZfixed, loopdataDimMainX, loopdataDimMainY, loopdataDimMainZ, inBlockLoopX,
+	inBlockLoopY, inBlockLoopZ, metaDataLength, loopMeta, loopWarpMeta, clearIterResShmemLoop, clearIterSourceShmemLoop, resShmemTotalLength, sourceShmemTotalLength, fn, fp, resList, inBlockLoopXZIterWithPadding, paddingStore, shmemblockDataLenght,
+	shmemblockDataLoop)
 
-   #@mainLoopKernel()
-    return
+	#@mainLoopKernel()
+	return
 end
 
-function mainKernelLoad(referenceArrs,dilatationArrs, mainArrDims,dataBdim
-    ,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent
-    ,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter
-    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount
-    ,globalIterationNumb,workQueue,workQueueCounter
-    ,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed
-    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY
-    ,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop
-    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop)
-    @mainLoopKernel()
-    return
+function mainKernelLoad(referenceArrs, dilatationArrs, mainArrDims, dataBdim, numberToLooFor, metaDataDims, metaData, iterThrougWarNumb, robustnessPercent, shmemSumLengthMaxDiv4, globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber,
+	globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb, workQueue, workQueueCounter, loopAXFixed, loopBXfixed, loopAYFixed, loopBYfixed, loopAZFixed, loopBZfixed, loopdataDimMainX, loopdataDimMainY, loopdataDimMainZ, inBlockLoopX,
+	inBlockLoopY, inBlockLoopZ, metaDataLength, loopMeta, loopWarpMeta, clearIterResShmemLoop, clearIterSourceShmemLoop, resShmemTotalLength, sourceShmemTotalLength, fn, fp, resList, inBlockLoopXZIterWithPadding, paddingStore, shmemblockDataLenght,
+	shmemblockDataLoop)
+	@mainLoopKernel()
+	return
 end
 
 
 function get_shmemMainKernel(dataBdim)
-    
-    shmemblockData= sizeof(UInt32)*32*32
-    # shmemblockData= sizeof(UInt32)*dataBdim[1]* dataBdim[2]
-    resShmemblockData= sizeof(UInt32)*32*32
-    # resShmemblockData= sizeof(UInt32)*dataBdim[1]* dataBdim[2]
-    shmemPaddings= sizeof(Bool)*(  max(dataBdim[1], dataBdim[2]))*(  max(dataBdim[1], dataBdim[2]))*6
-    shmemSum= sizeof(UInt32)*36*16
-    areToBeValidated= sizeof(Bool)*14
-    isAnythingInPadding= sizeof(Bool)*7
-    alreadyCoveredInQueues= sizeof(UInt32)*14
-    someBools = sizeof(Bool)*4
-    someInt16 = sizeof(UInt16)*6
-    workCountersInshmem = sizeof(UInt16)*2
-return workCountersInshmem+shmemSum+areToBeValidated+isAnythingInPadding+alreadyCoveredInQueues+someBools+shmemblockData+someInt16+resShmemblockData+shmemPaddings
+
+	shmemblockData = sizeof(UInt32) * 32 * 32
+	# shmemblockData= sizeof(UInt32)*dataBdim[1]* dataBdim[2]
+	resShmemblockData = sizeof(UInt32) * 32 * 32
+	# resShmemblockData= sizeof(UInt32)*dataBdim[1]* dataBdim[2]
+	shmemPaddings = sizeof(Bool) * (max(dataBdim[1], dataBdim[2])) * (max(dataBdim[1], dataBdim[2])) * 6
+	shmemSum = sizeof(UInt32) * 36 * 16
+	areToBeValidated = sizeof(Bool) * 14
+	isAnythingInPadding = sizeof(Bool) * 7
+	alreadyCoveredInQueues = sizeof(UInt32) * 14
+	someBools = sizeof(Bool) * 4
+	someInt16 = sizeof(UInt16) * 6
+	workCountersInshmem = sizeof(UInt16) * 2
+	return workCountersInshmem + shmemSum + areToBeValidated + isAnythingInPadding + alreadyCoveredInQueues + someBools + shmemblockData + someInt16 + resShmemblockData + shmemPaddings
 end
 
 function get_shmemBoolKernel(dataBdim)
-    # shmemSum= sizeof(Float32)*32*2
-    shmemblockData= sizeof(Int32)*(dataBdim[1])*(dataBdim[2])
-    localQuesValues = sizeof(UInt32)*14
-    minMaxes = sizeof(Float32)*6
-return minMaxes+localQuesValues+shmemblockData
+	# shmemSum= sizeof(Float32)*32*2
+	shmemblockData = sizeof(Int32) * (dataBdim[1]) * (dataBdim[2])
+	localQuesValues = sizeof(UInt32) * 14
+	minMaxes = sizeof(Float32) * 6
+	return minMaxes + localQuesValues + shmemblockData
 end
 
 """
@@ -118,106 +226,319 @@ to calculate optimal number of threads and blocks to run a kernel
 robustnessPercent - frequently we do not want to analyze all of the fap and fn in order to reduce the impact of the outliers  
 numberToLooFor - what we will look for in main arrays
 """
-function preparehousedorfKernel(goldGPU,segmGPU,robustnessPercent,numberToLooFor)
-    mainArrDims = size(goldGPU)
-    dataBdim = (32,32,32) # will be modified after number of threads gets calculated by occupancy API
+function preparehousedorfKernel(goldGPU, segmGPU, robustnessPercent, numberToLooFor)
+	mainArrDims = size(goldGPU)
+	dataBdim = (32, 32, 32) # will be modified after number of threads gets calculated by occupancy API
 
-    metaData = MetaDataUtils.allocateMetadata(mainArrDims,dataBdim);
-    metaDataDims= size(metaData);
-    #for bool cube kernel
-    threadsBoolKern= (30,32); blocksBoolKern = 10#just some dummy will be modified after invoking occupancy API
-    #for main kernel
-    threadsMainKern= (30,32); blocksMainKern = 10#just some dummy will be modified after invoking occupancy API
-    iterThrougWarNumb = cld(14,threadsMainKern[2])
+	metaData = MetaDataUtils.allocateMetadata(mainArrDims, dataBdim)
+	metaDataDims = size(metaData)
+	#for bool cube kernel
+	threadsBoolKern = (30, 32)
+	blocksBoolKern = 10#just some dummy will be modified after invoking occupancy API
+	#for main kernel
+	threadsMainKern = (30, 32)
+	blocksMainKern = 10#just some dummy will be modified after invoking occupancy API
+	iterThrougWarNumb = cld(14, threadsMainKern[2])
 
-    inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength=calculateLoopsIter(dataBdim,threadsBoolKern[1],threadsBoolKern[2],metaDataDims,blocksBoolKern)
-        minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp  =getSmallForBoolKernel();
-        reducedGoldA,reducedSegmA=  getLargeForBoolKernel(mainArrDims,dataBdim);
-   
-    loopXinPlane,loopYinPlane = 1,1
-    boolKernelArgs = (mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength)
-    #needed also in bool kernel
-    
-    #### main kernel
-    fpLoc = 10
-    fnLoc = 10
-    resList= allocateResultLists(fpLoc,fnLoc)
-    globalFpResOffsetCounter,globalFnResOffsetCounter,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount,globalIterationNumb= getSmallGPUForHousedorff()
+	inBlockLoopXZIterWithPadding,
+	shmemblockDataLoop,
+	shmemblockDataLenght,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength = calculateLoopsIter(dataBdim, threadsBoolKern[1], threadsBoolKern[2], metaDataDims, blocksBoolKern)
+	minxRes, maxxRes, minyRes, maxyRes, minzRes, maxzRes, fn, fp = getSmallForBoolKernel()
+	reducedGoldA, reducedSegmA = getLargeForBoolKernel(mainArrDims, dataBdim)
 
-    referenceArrs=(goldGPU,segmGPU)
+	loopXinPlane, loopYinPlane = 1, 1
+	boolKernelArgs = (
+		mainArrDims,
+		dataBdim,
+		metaData,
+		metaDataDims,
+		reducedGoldA,
+		reducedSegmA,
+		loopXinPlane,
+		loopYinPlane,
+		minxRes,
+		maxxRes,
+		minyRes,
+		maxyRes,
+		minzRes,
+		maxzRes,
+		fn,
+		fp,
+		numberToLooFor,
+		inBlockLoopXZIterWithPadding,
+		shmemblockDataLoop,
+		shmemblockDataLenght,
+		loopAXFixed,
+		loopBXfixed,
+		loopAYFixed,
+		loopBYfixed,
+		loopAZFixed,
+		loopBZfixed,
+		loopdataDimMainX,
+		loopdataDimMainY,
+		loopdataDimMainZ,
+		inBlockLoopX,
+		inBlockLoopY,
+		inBlockLoopZ,
+		metaDataLength,
+		loopMeta,
+		loopWarpMeta,
+		clearIterResShmemLoop,
+		clearIterSourceShmemLoop,
+		resShmemTotalLength,
+		sourceShmemTotalLength,
+	)
+	#needed also in bool kernel
 
-    inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength=calculateLoopsIter(dataBdim,threadsBoolKern[1],threadsBoolKern[2],metaDataDims,blocksBoolKern)
-    shmemSumLengthMaxDiv4= fld((36*14),4)*4 # subject to futre changes
+	#### main kernel
+	fpLoc = 10
+	fnLoc = 10
+	resList = allocateResultLists(fpLoc, fnLoc)
+	globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber, globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb = getSmallGPUForHousedorff()
 
-    metaData,reducedGoldA  ,reducedSegmA ,paddingStore,resList,workQueue,workQueueCounter = getBigGPUForHousedorffAfterBoolKernel(metaData,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp,reducedGoldA,reducedSegmA,dataBdim)
-    
-    reducedGoldA,reducedSegmA=  getLargeForBoolKernel(mainArrDims,dataBdim);
+	referenceArrs = (goldGPU, segmGPU)
 
-    dilatationArrs= (reducedGoldA,reducedSegmA)
+	inBlockLoopXZIterWithPadding,
+	shmemblockDataLoop,
+	shmemblockDataLenght,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength = calculateLoopsIter(dataBdim, threadsBoolKern[1], threadsBoolKern[2], metaDataDims, blocksBoolKern)
+	shmemSumLengthMaxDiv4 = fld((36 * 14), 4) * 4 # subject to futre changes
 
-    mainKernelArgs= (referenceArrs,dilatationArrs, mainArrDims,dataBdim
-    ,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent
-    ,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter
-    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount
-    ,globalIterationNumb,workQueue,workQueueCounter
-    ,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed
-    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY
-    ,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop
-    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop)
-   
-    function get_shmemMainKernelLoc(threads)
-        dataBdim = (threads[1],threads[2],32)
-        get_shmemMainKernel(dataBdim)
-    end
-    
+	metaData, reducedGoldA, reducedSegmA, paddingStore, resList, workQueue, workQueueCounter = getBigGPUForHousedorffAfterBoolKernel(metaData, minxRes, maxxRes, minyRes, maxyRes, minzRes, maxzRes, fn, fp, reducedGoldA, reducedSegmA, dataBdim)
 
-    threadsMainKern,blocksMainKern = getThreadsAndBlocksNumbForKernel(get_shmemMainKernel,mainKernelLoad,(mainKernelArgs))
-    function get_shmemBoolKernelLoc(threads)
-        dataBdim = (threadsMainKern[1],threadsMainKern[2],32)
-        get_shmemBoolKernel(dataBdim)
-    end
+	reducedGoldA, reducedSegmA = getLargeForBoolKernel(mainArrDims, dataBdim)
 
-    boolKernelArgs = (mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength)
+	dilatationArrs = (reducedGoldA, reducedSegmA)
 
-     ## now we need to make use of occupancy API to get optimal number of threads and blocks fo each kernel
-    threadsBoolKern,blocksBoolKern = getThreadsAndBlocksNumbForKernel(get_shmemBoolKernelLoc,boolKernelLoad,(goldGPU,segmGPU,boolKernelArgs...))
-    
-    loopXinPlane,loopYinPlane = fld(threadsMainKern[1],threadsBoolKern[1] ), fld(threadsMainKern[2],threadsBoolKern[2] )
-#now we get defoult values of data b dim  set on the basis of the threadsMainHKernel; and generally recalculating loops constants 
-    dataBdim = (threadsMainKern[1],threadsMainKern[2],32)
-    metaData = MetaDataUtils.allocateMetadata(mainArrDims,dataBdim);
-    metaDataDims= size(metaData);
-    iterThrougWarNumb = cld(14,threadsMainKern[2])
+	mainKernelArgs = (referenceArrs, dilatationArrs, mainArrDims, dataBdim, numberToLooFor, metaDataDims, metaData, iterThrougWarNumb, robustnessPercent, shmemSumLengthMaxDiv4, globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber,
+		globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb, workQueue, workQueueCounter, loopAXFixed, loopBXfixed, loopAYFixed, loopBYfixed, loopAZFixed, loopBZfixed, loopdataDimMainX, loopdataDimMainY, loopdataDimMainZ, inBlockLoopX,
+		inBlockLoopY, inBlockLoopZ, metaDataLength, loopMeta, loopWarpMeta, clearIterResShmemLoop, clearIterSourceShmemLoop, resShmemTotalLength, sourceShmemTotalLength, fn, fp, resList, inBlockLoopXZIterWithPadding, paddingStore, shmemblockDataLenght,
+		shmemblockDataLoop)
 
-    boolKernelArgs = (mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength)
+	function get_shmemMainKernelLoc(threads)
+		dataBdim = (threads[1], threads[2], 32)
+		get_shmemMainKernel(dataBdim)
+	end
 
-    inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength=calculateLoopsIter(dataBdim,threadsBoolKern[1],threadsBoolKern[2],metaDataDims,blocksBoolKern)
-   
 
-    boolKernelArgs = (mainArrDims,dataBdim,metaData,metaDataDims,reducedGoldA,reducedSegmA,loopXinPlane,loopYinPlane,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp ,numberToLooFor,inBlockLoopXZIterWithPadding,shmemblockDataLoop,shmemblockDataLenght,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength)
-    metaData,reducedGoldA  ,reducedSegmA ,paddingStore,resList,workQueue,workQueueCounter= getBigGPUForHousedorffAfterBoolKernel(metaData,minxRes,maxxRes,minyRes,maxyRes,minzRes,maxzRes,fn,fp,reducedGoldA,reducedSegmA,dataBdim)
-    
-    reducedGoldA,reducedSegmA=  getLargeForBoolKernel(mainArrDims,dataBdim);
+	threadsMainKern, blocksMainKern = getThreadsAndBlocksNumbForKernel(get_shmemMainKernel, mainKernelLoad, (mainKernelArgs))
+	function get_shmemBoolKernelLoc(threads)
+		dataBdim = (threadsMainKern[1], threadsMainKern[2], 32)
+		get_shmemBoolKernel(dataBdim)
+	end
 
-    mainKernelArgs= (referenceArrs,dilatationArrs, mainArrDims,dataBdim
-    ,numberToLooFor,metaDataDims,metaData,iterThrougWarNumb,robustnessPercent
-    ,shmemSumLengthMaxDiv4,globalFpResOffsetCounter,globalFnResOffsetCounter
-    ,globalIterationNumber,globalCurrentFnCount,globalCurrentFpCount
-    ,globalIterationNumb,workQueue,workQueueCounter
-    ,loopAXFixed,loopBXfixed,loopAYFixed,loopBYfixed,loopAZFixed,loopBZfixed
-    ,loopdataDimMainX,loopdataDimMainY,loopdataDimMainZ,inBlockLoopX,inBlockLoopY
-    ,inBlockLoopZ,metaDataLength,loopMeta,loopWarpMeta,clearIterResShmemLoop
-    ,clearIterSourceShmemLoop,resShmemTotalLength,sourceShmemTotalLength, fn,fp,resList,inBlockLoopXZIterWithPadding,paddingStore,shmemblockDataLenght,shmemblockDataLoop)    
-    shmemSizeBool=get_shmemBoolKernelLoc(threadsBoolKern)
-    shmemSizeMain=get_shmemMainKernelLoc(threadsMainKern)
+	boolKernelArgs = (
+		mainArrDims,
+		dataBdim,
+		metaData,
+		metaDataDims,
+		reducedGoldA,
+		reducedSegmA,
+		loopXinPlane,
+		loopYinPlane,
+		minxRes,
+		maxxRes,
+		minyRes,
+		maxyRes,
+		minzRes,
+		maxzRes,
+		fn,
+		fp,
+		numberToLooFor,
+		inBlockLoopXZIterWithPadding,
+		shmemblockDataLoop,
+		shmemblockDataLenght,
+		loopAXFixed,
+		loopBXfixed,
+		loopAYFixed,
+		loopBYfixed,
+		loopAZFixed,
+		loopBZfixed,
+		loopdataDimMainX,
+		loopdataDimMainY,
+		loopdataDimMainZ,
+		inBlockLoopX,
+		inBlockLoopY,
+		inBlockLoopZ,
+		metaDataLength,
+		loopMeta,
+		loopWarpMeta,
+		clearIterResShmemLoop,
+		clearIterSourceShmemLoop,
+		resShmemTotalLength,
+		sourceShmemTotalLength,
+	)
 
-    # CUDA.unsafe_free!(goldGPU)
-    # CUDA.unsafe_free!(segmGPU)
-    #CUDA.reclaim()
-return (boolKernelArgs, mainKernelArgs,threadsBoolKern,blocksBoolKern ,threadsMainKern,blocksMainKern ,shmemSizeBool,shmemSizeMain)
+	## now we need to make use of occupancy API to get optimal number of threads and blocks fo each kernel
+	threadsBoolKern, blocksBoolKern = getThreadsAndBlocksNumbForKernel(get_shmemBoolKernelLoc, boolKernelLoad, (goldGPU, segmGPU, boolKernelArgs...))
+
+	loopXinPlane, loopYinPlane = fld(threadsMainKern[1], threadsBoolKern[1]), fld(threadsMainKern[2], threadsBoolKern[2])
+	#now we get defoult values of data b dim  set on the basis of the threadsMainHKernel; and generally recalculating loops constants 
+	dataBdim = (threadsMainKern[1], threadsMainKern[2], 32)
+	metaData = MetaDataUtils.allocateMetadata(mainArrDims, dataBdim)
+	metaDataDims = size(metaData)
+	iterThrougWarNumb = cld(14, threadsMainKern[2])
+
+	boolKernelArgs = (
+		mainArrDims,
+		dataBdim,
+		metaData,
+		metaDataDims,
+		reducedGoldA,
+		reducedSegmA,
+		loopXinPlane,
+		loopYinPlane,
+		minxRes,
+		maxxRes,
+		minyRes,
+		maxyRes,
+		minzRes,
+		maxzRes,
+		fn,
+		fp,
+		numberToLooFor,
+		inBlockLoopXZIterWithPadding,
+		shmemblockDataLoop,
+		shmemblockDataLenght,
+		loopAXFixed,
+		loopBXfixed,
+		loopAYFixed,
+		loopBYfixed,
+		loopAZFixed,
+		loopBZfixed,
+		loopdataDimMainX,
+		loopdataDimMainY,
+		loopdataDimMainZ,
+		inBlockLoopX,
+		inBlockLoopY,
+		inBlockLoopZ,
+		metaDataLength,
+		loopMeta,
+		loopWarpMeta,
+		clearIterResShmemLoop,
+		clearIterSourceShmemLoop,
+		resShmemTotalLength,
+		sourceShmemTotalLength,
+	)
+
+	inBlockLoopXZIterWithPadding,
+	shmemblockDataLoop,
+	shmemblockDataLenght,
+	loopAXFixed,
+	loopBXfixed,
+	loopAYFixed,
+	loopBYfixed,
+	loopAZFixed,
+	loopBZfixed,
+	loopdataDimMainX,
+	loopdataDimMainY,
+	loopdataDimMainZ,
+	inBlockLoopX,
+	inBlockLoopY,
+	inBlockLoopZ,
+	metaDataLength,
+	loopMeta,
+	loopWarpMeta,
+	clearIterResShmemLoop,
+	clearIterSourceShmemLoop,
+	resShmemTotalLength,
+	sourceShmemTotalLength = calculateLoopsIter(dataBdim, threadsBoolKern[1], threadsBoolKern[2], metaDataDims, blocksBoolKern)
+
+
+	boolKernelArgs = (
+		mainArrDims,
+		dataBdim,
+		metaData,
+		metaDataDims,
+		reducedGoldA,
+		reducedSegmA,
+		loopXinPlane,
+		loopYinPlane,
+		minxRes,
+		maxxRes,
+		minyRes,
+		maxyRes,
+		minzRes,
+		maxzRes,
+		fn,
+		fp,
+		numberToLooFor,
+		inBlockLoopXZIterWithPadding,
+		shmemblockDataLoop,
+		shmemblockDataLenght,
+		loopAXFixed,
+		loopBXfixed,
+		loopAYFixed,
+		loopBYfixed,
+		loopAZFixed,
+		loopBZfixed,
+		loopdataDimMainX,
+		loopdataDimMainY,
+		loopdataDimMainZ,
+		inBlockLoopX,
+		inBlockLoopY,
+		inBlockLoopZ,
+		metaDataLength,
+		loopMeta,
+		loopWarpMeta,
+		clearIterResShmemLoop,
+		clearIterSourceShmemLoop,
+		resShmemTotalLength,
+		sourceShmemTotalLength,
+	)
+	metaData, reducedGoldA, reducedSegmA, paddingStore, resList, workQueue, workQueueCounter = getBigGPUForHousedorffAfterBoolKernel(metaData, minxRes, maxxRes, minyRes, maxyRes, minzRes, maxzRes, fn, fp, reducedGoldA, reducedSegmA, dataBdim)
+
+	reducedGoldA, reducedSegmA = getLargeForBoolKernel(mainArrDims, dataBdim)
+
+	mainKernelArgs = (referenceArrs, dilatationArrs, mainArrDims, dataBdim, numberToLooFor, metaDataDims, metaData, iterThrougWarNumb, robustnessPercent, shmemSumLengthMaxDiv4, globalFpResOffsetCounter, globalFnResOffsetCounter, globalIterationNumber,
+		globalCurrentFnCount, globalCurrentFpCount, globalIterationNumb, workQueue, workQueueCounter, loopAXFixed, loopBXfixed, loopAYFixed, loopBYfixed, loopAZFixed, loopBZfixed, loopdataDimMainX, loopdataDimMainY, loopdataDimMainZ, inBlockLoopX,
+		inBlockLoopY, inBlockLoopZ, metaDataLength, loopMeta, loopWarpMeta, clearIterResShmemLoop, clearIterSourceShmemLoop, resShmemTotalLength, sourceShmemTotalLength, fn, fp, resList, inBlockLoopXZIterWithPadding, paddingStore, shmemblockDataLenght,
+		shmemblockDataLoop)
+	shmemSizeBool = get_shmemBoolKernelLoc(threadsBoolKern)
+	shmemSizeMain = get_shmemMainKernelLoc(threadsMainKern)
+
+	# CUDA.unsafe_free!(goldGPU)
+	# CUDA.unsafe_free!(segmGPU)
+	#CUDA.reclaim()
+	return (boolKernelArgs, mainKernelArgs, threadsBoolKern, blocksBoolKern, threadsMainKern, blocksMainKern, shmemSizeBool, shmemSizeMain)
 
 end
 
 end# module
-
-    

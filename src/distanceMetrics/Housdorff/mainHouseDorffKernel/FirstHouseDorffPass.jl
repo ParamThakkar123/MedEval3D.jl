@@ -9,31 +9,22 @@ Now we need to:
     -as we already loaded data from global memory - what is supposedly most expensive part - we can do the first dilatation step
     -we prepare rudamentary work plan for  next step    
 
-
 Toexperiment
     reducePaddingPlane   #to be experimented is it better to reduce to varyiong y or x 
-
-
-
 """
 module FirstHouseDorffPass
-using CUDA, ..CUDAGpuUtils, Logging,StaticArrays
+using CUDA, ..CUDAGpuUtils, Logging, StaticArrays
 
 """
 prepare first pass of Housedorff kernel run
 datablockDim - the edge length of cube describing the block of data we are working on  - defoult is 32 - which would produce blocks of size 32x32x32
 """
-function executefirstHouseDorffPassKernel(datablockDim,metaData)
-
-    threadsNum = (datablockDim,datablockDim)
+function executefirstHouseDorffPassKernel(datablockDim, metaData)
+    threadsNum = (datablockDim, datablockDim)
     blocksNum = size(metaData)
+end #executefirstHouseDorffPassKernel
 
-
-
-end#executefirstHouseDorffPassKernel
 """
-
-
 main kernel of muodule it will get 4 data arrays -   reducedGoldA,reducedSegmA,reducedGoldB,reducedSegmB
     we work on all simultaneously
 
@@ -60,40 +51,15 @@ main kernel of muodule it will get 4 data arrays -   reducedGoldA,reducedSegmA,r
     mainQuesCounter - counter that we will update atomically and will be usefull to populate the work queue
     mainWorkQueue - the list of the indicies of  data blocks in metadata with additional information is it referencing the goldpass or second one 
 """
-function firstHouseDorffPassKernel( reducedArrays
-                                    ,metaData
-                                    ,metadataDims::Tuple{UInt8,UInt8,UInt8}
-                                    ,resArrays 
-                                    ,datablockDim 
-                                    ,mainQuesCounter
-                                    ,mainWorkQueue )
+function firstHouseDorffPassKernel(reducedArrays, metaData, metadataDim::Tuple{UInt8, UInt8, UInt8}, resArrays, datablockDim, mainQuesCounter, mainWorkQueue)
     ############initializations of data 
-    resShmem,  isMaskFull, isMaskEmpty,locArr = memoryAllocations(datablockDim,zDim)
+    resShmem, isMaskFull, isMaskEmpty, locArr = memoryAllocations(datablockDim, zDim)
     #we iterate over metadata dimensions ...
-    @unroll for xdim = UInt8(1):metaDatDims[1], ydim= UInt8(1):metaDatDims[2], ispassGoldd in [true, false]
-        singleDataBlockPass(reducedArrays[ispassGoldd*2+1]
-        ,reducedArrays[ispassGoldd*2+2]
-        ,UInt16(1)
-        ,((xdim-1)*32)+1
-        ,((ydim-1)*32)+1
-        ,((blockIdx().x -1)*32)+1
-        ,isMaskFull
-        ,isMaskEmpty
-        ,resShmem
-        ,locArr
-        ,metaData
-        ,metadataDims
-        ,ispassGoldd
-        ,xdim
-        ,ydim
-        ,blockIdx().x
-        ,mainQuesCounter
-        ,mainWorkQueue
-        ,resArrays[ispassGoldd+1] )
-  end#for
-# in this spot we should have already filled work queue, set information which blocks are full or empty, and got throught first dilatation step
-
-
+    @unroll for xdim ∈ UInt8(1):metaDatDims[1], ydim ∈ UInt8(1):metaDatDims[2], ispassGoldd in [true, false]
+        singleDataBlockPass(reducedArrays[ispassGoldd*2+1], reducedArrays[ispassGoldd*2+2], UInt16(1), ((xdim - 1) * 32) + 1, ((ydim - 1) * 32) + 1, ((blockIdx().x - 1) * 32) + 1, isMaskFull, isMaskEmpty, resShmem, locArr, metaData, metadataDims,
+            ispassGoldd, xdim, ydim, blockIdx().x, mainQuesCounter, mainWorkQueue, resArrays[ispassGoldd+1])
+    end #for
+    # in this spot we should have already filled work queue, set information which blocks are full or empty, and got throught first dilatation step
 end #FirstHouseDorffPassKernel
 
 """
@@ -111,35 +77,15 @@ currMatadataBlockX,currMatadataBlockY, currMatadataBlockZ - cartesian coordinate
 mainQuesCounter - counter that we will update atomically and will be usefull to populate the work queue
 mainWorkQueue - the list of the indicies of  data blocks in metadata with additional information is it referencing the goldpass or second one 
 """
-function singleDataBlockPass(analyzedArr
-                ,refAray
-                ,iterationNumber
-                ,blockBeginingX
-                ,blockBeginingY
-                ,blockBeginingZ
-                ,isMaskFull
-                ,isMaskEmpty
-                ,resShmem
-                ,locArr
-                ,metaData
-                ,metadataDims::Tuple{UInt8,UInt8,UInt8}
-                ,isPassGold::Bool
-                ,currMatadataBlockX::UInt8
-                ,currMatadataBlockY::UInt8
-                ,currMatadataBlockZ::UInt8
-                ,mainQuesCounter
-                ,mainWorkQueue
-                ,resArray )
-            ############### execution
-            executeDataIterFirstPass(analyzedArr, refAray,iterationNumber,blockBeginingX,blockBeginingY,blockBeginingZ,isMaskFull,isMaskEmpty,resShmem,locArr,resArray,mainQuesCounter)
-            #for futher processing we need to have space in main shmem
-            clearMainShmem(shmem)
-            #now we need to deal with padding in shmem res
-            processAllPaddingPlanes(x,y,z,shmem,currBlockX,currBlockY,currBlockZ,sourceArray,referenceArray,resArray,metaData,metadataDims,isPassGold,locArr)
-            # now let's check weather block is eligible for futher processing - for this we need sums ...
-            isActiveForFirstPass(isMaskFull, isMaskEmpty,resShmem,currMatadataBlockX,currMatadataBlockY,currMatadataBlockZ,isPassGold,metaData,mainQuesCounter,mainWorkQueue)
-end#singleDataBlockPass
-
-
+function singleDataBlockPass(analyzedArr, refAray, iterationNumber, blockBeginingX, blockBeginingY, blockBeginingZ, isMaskFull, isMaskEmpty, resShmem, locArr, metaData, metadataDims::Tuple{UInt8, UInt8, UInt8}, isPassGold::Bool, currMatadataBlockX::UInt8,
+    currMatadataBlockY::UInt8, currMatadataBlockZ::UInt8, mainQuesCounter, mainWorkQueue, resArray)
+    ############### execution
+    executeDataIterFirstPass(analyzedArr, refAray, iterationNumber, blockBeginingX, blockBeginingY, blockBeginingZ, isMaskFull, isMaskEmpty, resShmem, locArr, resArray, mainQuesCounter)
+    #for futher processing we need to have space in main shmem
+    clearMainShmem(shmem)
+    #now we need to deal with padding in shmem res
+    processAllPaddingPlanes(x, y, z, shmem, currBlockX, currBlockY, currBlockZ, sourceArray, referenceArray, resArray, metaData, metadataDims, isPassGold, locArr)
+    # now let's check weather block is eligible for futher processing - for this we need sums ...
+    isActiveForFirstPass(isMaskFull, isMaskEmpty, resShmem, currMatadataBlockX, currMatadataBlockY, currMatadataBlockZ, isPassGold, metaData, mainQuesCounter, mainWorkQueue)
+end #singleDataBlockPass
 end #FirstHouseDorffPass
-

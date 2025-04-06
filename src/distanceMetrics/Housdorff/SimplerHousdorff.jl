@@ -26,19 +26,12 @@ Metadata
         of course we check it only in case new counter is bigger than old counter 
   concurrently we do some housekeeping so we check weather counters for result are not  indicating that we already finished
 
-
-
-
-
-
 Work will have 3 parts - 3 kernels 
     1) will prepare data - will return source array in boolean format and will give benchmark
     max and min x,y,z of either mask - to describe smallest possible cube holding all necessary data 
     2)first pass through the data  that will mark which data blocks are acteve or full ...  - it will also prepare  the rudamentary worplan for first iteration in phase 3
     3)the actual working part - there will be shceduling block that will pass what work should be done by other blocks - copying da, deciding to terminate etc.
         - rest of the block will iteratively analyze data blocks scheduled by scheduling block
-
-
 So we will need the block of data representing each wall of the bit cube bit cuve will have edge length of 32 - apart from corner cases
 
 Simplification
@@ -159,16 +152,6 @@ function housedorffMetadataKernel(matadata
     @unroll for k in 1:32
         shemm[blockIdx().x,blockIdx().y,k]=  [ (blockIdx().x-1)*dimOfThreadBlock+threadIdxX(),(blockIdx().y-1)*dimOfThreadBlock+threadIdxY(),(blockIdx().z-1)*dimOfThreadBlock+k]
     end#for
-
-                                # each lane will be responsible for one meta data  
-    # @unroll for k in 0:metadataDims[1]
-    #     matadata[threadIdxX(),k+1, blockIdx().x,1]=(threadIdxX()-1)*32   #min x
-    #     matadata[threadIdxX(),k+1, blockIdx().x,2]=min(threadIdxX()*32,arrGoldDims[1])   #max x
-    #     matadata[threadIdxX(),k+1, blockIdx().x,3]=k*32   #min y
-    #     matadata[threadIdxX(),k+1, blockIdx().x,4]=min((k+1)*32,arrGoldDims[2] )   #max y
-    #     matadata[threadIdxX(),k+1, blockIdx().x,5]=(blockIdx().x-1)*32   #min z
-    #     matadata[threadIdxX(),k+1, blockIdx().x,6]=min((blockIdx().x)*32,arrGoldDims[3])   #max z
-    # end#for
 end #housedorffMetadataKernel
 
 
@@ -238,17 +221,6 @@ function allocateMomory(arrGoldDims::Tuple{Int64, Int64, Int64}
     y=cld(arrGoldDims[2],dimOfThreadBlock)
     z=cld(arrGoldDims[3],dimOfThreadBlock)
 
-
-    #we need just some blocks to set in the schedule for the begining - the scheduling block will refine it 
-    # workNumbPerBlock = cld(x*y*z,dataBlocksNum)
-    # workScheduleCPU = zeros(UInt16,blocksNum, workNumbPerBlock  ,4)
-    # Threads.@threads for i in 1:blocksNum
-    #                         for j in 1:workNumbPerBlock
-    #                         workScheduleCPU
-    #                         end    
-    #                     end
-
-
     workSchedule= CUDA.zeros(UInt16,blocksNum, cld(x*y*z,dataBlocksNum)  ,4) #in each entry 1) x;2)y;3)z;4)1 if gold standard pass and 2 if segm pass  ; length is set so we will have approximately equal number of blocks to work on
 
 
@@ -268,70 +240,4 @@ function allocateMomory(arrGoldDims::Tuple{Int64, Int64, Int64}
 
 return (metaData)
 end#allocateMomory
-
-
 end#SimplerHousdorff
-
-
-
-
-
-    # #first we choose biggest dimension and this will be dimension of elongated block
-    # arrGoldDims= size(arrGold)
-    # maxDim = argmax(size(arrGold))
-    # localArr = [0,0,0]
-    # for i in 1:3
-    #     if(i!=maxDim)
-    #         localArr[i]= cld(arrGoldDims[i],32)
-    #     else
-    #         #we are now in max dimension
-    #         localArr[i]= cld(arrGoldDims[i],maxThrPerB)
-    #     end#if    
-    # end#for
-
-
-
-# """
-# getting dimensions  needed to run number of blocks that will cover all of data to prepare metadata  
-# metasataDims - dimensions of metasata array - 4 dims tuple
-# maxThrPerB - maximum number of threads per block defoult is 1024
-#     return the information to the kernel how to create its blocks of threads (how many); and the number of threads in a block 
-# """
-# function getBlockNumb(metasataDims::Tuple{Int64, Int64, Int64, Int64},maxThrPerB::Int64=1024)  
-
-#     return ( metasataDims[3] ,maxThrPerB)
-# end#getBlockNumb
-
-
-    
-# """
-# kernel that output metadata for Housedorff
-#     matadata - Int16 4 dimensional array where x,y,z dims identical to data blocks  and 4 dim stores 6 numbers 
-#         Is activeOrFullForFirsPassgold - 2 if neither in first mask , 1 if full in first mask; 0 if active in first mask 
-#         Is activeOrFullForFirsPasssegm - 2 if neither in first mask , 1 if full in first mask; 0 if active in first mask 
-#         Is activeOrFullForSecondPassgold - 2 if neither in first mask , 1 if full in first mask; 0 if active in first mask 
-#         Is activeOrFullForSecondPassSegm - 2 if neither in first mask , 1 if full in first mask; 0 if active in first mask 
-#         activeIterNumbMaskA - The number of iteration when block was last active - needed to coordinate which block will be working now
-#         activeIterNumbMaskB - The number of iteration when block was last active - needed to coordinate which block will be working now
-#         metadataDims - dimensions of metadata - 4 dims tuple
-#         arrGoldDims - dimensions of the main array
-#     IMPORTANT - althought this is 1 dimensional kernel we will output 3 dim data
-#         so blockIdx().x - gives info about z - dimension 
-#         threadIdxX() - tell about position in x dimension
-#         in y dimension we will iterate in a loop the number that is equal to the number of the size of the  y dimension (remember we are talking about metadata array)
-
-
-# """
-# function housedorffMetadataKernel(matadata
-#                                 ,metadataDims::Tuple{Int64, Int64, Int64, Int64}
-#                                 ,arrGoldDims::Tuple{Int64, Int64, Int64} )
-#     # each lane will be responsible for one meta data  
-#     @unroll for k in 0:metadataDims[1]
-#         matadata[threadIdxX(),k+1, blockIdx().x,1]=(threadIdxX()-1)*32   #min x
-#         matadata[threadIdxX(),k+1, blockIdx().x,2]=min(threadIdxX()*32,arrGoldDims[1])   #max x
-#         matadata[threadIdxX(),k+1, blockIdx().x,3]=k*32   #min y
-#         matadata[threadIdxX(),k+1, blockIdx().x,4]=min((k+1)*32,arrGoldDims[2] )   #max y
-#         matadata[threadIdxX(),k+1, blockIdx().x,5]=(blockIdx().x-1)*32   #min z
-#         matadata[threadIdxX(),k+1, blockIdx().x,6]=min((blockIdx().x)*32,arrGoldDims[3])   #max z
-#     end#for
-# end #housedorffMetadataKernel

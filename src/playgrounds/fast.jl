@@ -17,15 +17,11 @@ https://stats.stackexchange.com/questions/147210/efficient-fast-mahalanobis-dist
 
 """
 
-
-
 using LinearAlgebra
 x = [4 5 9]
 A = [ 6 15 55;15 55 225;55 225 979  ]
 
 x* inv(A)* transpose(x)
-
-
 
 L = zeros(3,3)
 lower =L
@@ -64,8 +60,6 @@ y=[0.0,0.0,0.0]
 x = [4.0,5.0,9.0]
 y[1]= x[1]/L[1,1] 
 y[2] = (x[2]-L[2,1]*y[1])/L[2,2]
-#y[3]= (x[3] -y[2]*L[3,2] - y[3]*L[3,3])/L[3,1]
-#y[1]* L[3,1]+ y[2]*L[3,2] + y[3]*L[3,3]= x[3]
 y[3]= (x[3]-y[2]*L[3,2]-y[1]* L[3,1])/L[3,3]
 
 L*y
@@ -80,16 +74,6 @@ A = [ 6.0 15.0 55.0;
 
     transpose(x)* inv(A)*x
 y[1]^2+y[2]^2+y[3]^2
-
-
-
-
-
-
-
-
-
-
 
 L2 = zeros(3,3)
 n=3
@@ -121,9 +105,6 @@ for i in 1:n
 end#for
 L2
 
-
-
-
 #######working unrolled
 L2 = zeros(Float32,3,3)
 sumAA11=0.0
@@ -133,7 +114,6 @@ sumAA31=0.0
 sumAA32=0.0
 sumAA33=0.0
 
-
 #unrolled 3 by 3 cholesky decomposition# aa 
 sumAA11 += (L2[1,1])^2 
  L2[1,1] = sqrt(A[1,1] - sumAA11)
@@ -158,12 +138,6 @@ y[2] = (x[2]-L2[2,1]*y[1])/L2[2,2]
 y[3]= (x[3]-y[2]*L2[3,2]-y[1]* L2[3,1])/L2[3,3]
 #taking square euclidean distance
 y[1]^2+y[2]^2+y[3]^2#should be 4.28
-
-
-
-
-#####
-
 
 L2 = zeros(Float32,3,3)
 sumAA11=0.0
@@ -173,7 +147,6 @@ sumAA31=0.0
 sumAA32=0.0
 sumAA33=0.0
 
-
 #unrolled 3 by 3 cholesky decomposition# aa 
 sumAA11 += (L2[1,1])^2 
  L2[1,1] = sqrt(A[1,1] - sumAA11)
@@ -198,11 +171,7 @@ y[2] = (x[2]-L2[2,1]*y[1])/L2[2,2]
 y[3]= (x[3]-y[2]*L2[3,2]-y[1]* L2[3,1])/L2[3,3]
 #taking square euclidean distance
 y[1]^2+y[2]^2+y[3]^2#should be 4.28
-
-
 ##############
-
-
 
 L2 = zeros(Float32,3,3)
 sumAA11=0.0
@@ -242,358 +211,3 @@ y[2] = (x[2]-L2[2,1]*y[1])/L2[2,2]
 y[3]= (x[3]-y[2]*L2[3,2]-y[1]* L2[3,1])/L2[3,3]
 #taking square euclidean distance
 y[1]^2+y[2]^2+y[3]^2#should be 4.28
-
-
-
-
-
-
-
-
-
-x 1  y 3 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0  
-x 2  y 3 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-x 3  y 3 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-x 1  y 4 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 2  y 4 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 3  y 4 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 1  y 1 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 2  y 1 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 3  y 1 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 1  y 2 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 2  y 2 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 3  y 2 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 1  y 7 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 2  y 7 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 3  y 7 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 1  y 4 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 2  y 4 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 3  y 4 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 1  y 5 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 2  y 5 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 3  y 5 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 1  y 6 z 1   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 2  y 6 z 1   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 3  y 6 z 1   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 1  y 3 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 2  y 3 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 3  y 3 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 1  y 4 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 2  y 4 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 3  y 4 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 1  y 1 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 2  y 1 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 3  y 1 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 1  y 2 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 2  y 2 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 3  y 2 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 1  y 5 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 2  y 5 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 3  y 5 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 1  y 4 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 2  y 4 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 3  y 4 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 1  y 3 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-x 2  y 3 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-x 3  y 3 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-x 1  y 6 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-x 2  y 6 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-x 3  y 6 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-x 1  y 7 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-x 2  y 7 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-x 3  y 7 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-x 1  y 4 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 2  y 4 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 3  y 4 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0  
-x 1  y 1 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 2  y 1 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 3  y 1 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 1  y 2 z 2   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 2  y 2 z 2   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 3  y 2 z 2   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 1  y 3 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 2  y 3 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 3  y 3 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 1  y 4 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 2  y 4 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 3  y 4 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 1  y 2 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 2  y 2 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 3  y 2 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 1  y 1 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-x 2  y 1 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-x 3  y 1 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-x 4  y 5 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 5  y 5 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 6  y 5 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-x 4  y 3 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-x 5  y 3 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-x 6  y 3 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-x 4  y 6 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 5  y 6 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 6  y 6 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 4  y 7 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 5  y 7 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 6  y 7 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 4  y 4 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 5  y 4 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 6  y 4 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 4  y 1 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 5  y 1 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 6  y 1 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 4  y 2 z 1   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 5  y 2 z 1   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 6  y 2 z 1   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 4  y 4 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 5  y 4 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 6  y 4 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 4  y 4 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 5  y 4 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 6  y 4 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 4  y 2 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 5  y 2 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 6  y 2 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 4  y 3 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 5  y 3 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 6  y 3 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 4  y 1 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 5  y 1 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 6  y 1 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 4  y 5 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 5  y 5 z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 6  y 5 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 4  y 4 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 5  y 4 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 6  y 4 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 4  y 3 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-4 5si  y 3 z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-nx 6  y 3 z 2   xMeta 1  xdim 0 offset 3  idX 3g  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-x 4  y 6 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1l  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-x 5  y 6e z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-Vx 6  y 6 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-ax 4  y 7 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-lx 5  y 7 z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-[x 6  y 7 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-1x 4  y 1 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-]x 5  y 1 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-)x 6  y 1 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-julia> Int64(singleVal[1])x 4  y 1 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 5  y 1
- z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 6  y 1 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 4  y 4 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 5  y 4 z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 6  y 4 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 4  y 2 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 5  y 2 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 6  y 2 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 4  y 2 z 2   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 5  y 2 z 2   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 6  y 2 z 2   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 4  y 4 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 5  y 4 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 6  y 4 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 4  y 3 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 5  y 3 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 6  y 3 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 7  y 4 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 0 offset 2
-x 7  y 3 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 0 offset 0
-343x 7
-  y 5 z 1
-   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 0 offset 0
-julia> x 7  y 4 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 0 offset 0
-x 7  y 1 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 0 offset 0
-x 7  y 2 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 0 offset 0
-x 7  y 6 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 0 offset 0
-x 7  y 7 z 1   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 0 offset 0
-x 7  y 1 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 0 offset 2
-x 7  y 4 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 0 offset 4
-x 7  y 2 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 0 offset 2
-x 7  y 3 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 0 offset 2
-x 7  y 3 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 0  zdim 1 offset 0
-x 7  y 5 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 0  zdim 1 offset 0
-x 7  y 4 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 0  zdim 1 offset 0
-x 7  y 1 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 0  zdim 1 offset 0
-x 7  y 4 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 1  zdim 1 offset 2
-x 7  y 6 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 0  zdim 1 offset 0
-x 7  y 2 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 0  zdim 1 offset 0
-x 7  y 7 z 2   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 0  zdim 1 offset 0
-x 7  y 1 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 1  zdim 1 offset 2
-julia> x 7  y 2 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 1  zdim 1 offset 2
-x 7  y 4 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 2  zdim 1 offset 4
-x 7  y 3 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 1  zdim 1 offset 2
-x 1  y 7 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2
-x 2  y 7 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2  
-x 3  y 7 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2
-x 1  y 1 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 2  y 1 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 3  y 1 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 1  y 5 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 2  y 5 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 3  y 5 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 1  y 2 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 2  y 2 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 3  y 2 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 1  y 3 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 2  y 3 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 3  y 3 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 1  y 6 z 3   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 2  y 6 z 3   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 3  y 6 z 3   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 1  y 4 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 2  y 4 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 3  y 4 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 1  y 5 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 2  y 5 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 3  y 5 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 1  y 6 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 2  y 6 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 3  y 6 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 1  y 7 z 5   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 2  y 7 z 5   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 3  y 7 z 5   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 1  y 7 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 2  y 7 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 3  y 7 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 1  y 1 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 2  y 1 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 3  y 1 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 1  y 5 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 2  y 5 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 3  y 5 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 1  y 6 z 4   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 2  y 6 z 4   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 3  y 6 z 4   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 4  y 4 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 5  y 4 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 6  y 4 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 1  y 2 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 2  y 2 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 3  y 2 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 1  y 5 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 2  y 5 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 3  y 5 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 1  y 3 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 2  y 3 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 3  y 3 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 1  y 6 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 2  y 6 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 3  y 6 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 1  y 7 z 6   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 2  y 7 z 6   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 3  y 7 z 6   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 4  y 7 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2
-x 5  y 7 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2
-x 6  y 7 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2  
-x 4  y 1 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 5  y 1 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 6  y 1 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 4  y 5 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 5  y 5 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 6  y 5 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 7  y 4 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 4  zMeta 3  zdim 0 offset 6
-x 4  y 6 z 3   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 5  y 6 z 3   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 6  y 6 z 3   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 4  y 2 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 5  y 2 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 6  y 2 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 4  y 5 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 5  y 5 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 6  y 5 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 4  y 3 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 5  y 3 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 6  y 3 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 4  y 6 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 5  y 6 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 6  y 6 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 4  y 7 z 5   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 5  y 7 z 5   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 6  y 7 z 5   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 4  y 7 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 5  y 7 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 6  y 7 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 4  y 1 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 5  y 1 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 6  y 1 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 4  y 5 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 5  y 5 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 6  y 5 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 4  y 6 z 4   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 5  y 6 z 4   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 6  y 6 z 4   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 4  y 2 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 5  y 2 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 6  y 2 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4
-x 4  y 5 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 5  y 5 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 6  y 5 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 4  y 3 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 5  y 3 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 6  y 3 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 4  y 6 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 5  y 6 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 6  y 6 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 4  y 7 z 6   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 5  y 7 z 6   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 6  y 7 z 6   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 7  y 7 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 0 offset 2
-x 7  y 5 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 0 offset 2
-x 7  y 6 z 3   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 0 offset 2
-x 7  y 1 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 0 offset 4
-x 7  y 2 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 0 offset 4
-x 7  y 3 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 0 offset 4
-x 7  y 5 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 0 offset 4
-x 7  y 6 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 0 offset 4
-x 7  y 7 z 5   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 0 offset 4
-x 7  y 7 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 1  zdim 1 offset 2
-x 7  y 5 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 1  zdim 1 offset 2
-x 7  y 6 z 4   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 1  zdim 1 offset 2
-x 7  y 1 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 2  zdim 1 offset 4
-x 7  y 2 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 2  zdim 1 offset 4  
-x 7  y 3 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 2  zdim 1 offset 4
-x 7  y 5 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 2  zdim 1 offset 4
-x 7  y 6 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 2  zdim 1 offset 4
-x 7  y 7 z 6   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 2  zdim 1 offset 4
-x 1  y 3 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 2  y 3 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 3  y 3 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 1  y 1 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 2  y 1 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 3  y 1 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 1  y 2 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 2  y 2 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 3  y 2 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 1  y 5 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 2  y 5 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 3  y 5 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 1  y 6 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 2  y 6 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 3  y 6 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 1  y 7 z 7   xMeta 0  xdim 0 offset 0  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 2  y 7 z 7   xMeta 0  xdim 0 offset 0  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 3  y 7 z 7   xMeta 0  xdim 0 offset 0  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 4  y 3 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 5  y 3 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 6  y 3 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 4  y 1 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 5  y 1 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 6  y 1 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 4  y 2 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 5  y 2 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 6  y 2 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 4  y 5 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 5  y 5 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 6  y 5 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 4  y 6 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 5  y 6 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 6  y 6 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 4  y 7 z 7   xMeta 1  xdim 0 offset 3  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 5  y 7 z 7   xMeta 1  xdim 0 offset 3  idX 2  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 6  y 7 z 7   xMeta 1  xdim 0 offset 3  idX 3  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
-x 7  y 3 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 3  zMeta 3  zdim 0 offset 6
-x 7  y 1 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 1  zMeta 3  zdim 0 offset 6
-x 7  y 2 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 0  ydim 0 offset 0  idy 2  zMeta 3  zdim 0 offset 6
-x 7  y 5 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 1  zMeta 3  zdim 0 offset 6
-x 7  y 6 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 2  zMeta 3  zdim 0 offset 6
-x 7  y 7 z 7   xMeta 2  xdim 0 offset 6  idX 1  yMeta 1  ydim 0 offset 4  idy 3  zMeta 3  zdim 0 offset 6
